@@ -150,20 +150,19 @@ borehole_func <- function(x) {
 # ==============================================================
 # MODULE 5 & 6: N Independent Trials Loop
 # ==============================================================
-N_trials <- 30  # 30独立试验保证统计显著性
+N_trials <- 30  
 s <- 15; n <- 3; k <- 3
 levels_total <- s * k
 
 results_all <- data.frame(Trial = integer(), Method = character(), 
                           RMSE = numeric(), MAE = numeric(), stringsAsFactors = FALSE)
 
-# 用于存储第一次试验的数据，以便后续生成散点图和投影图
 plot_data <- list()
 
 cat(sprintf("Starting %d Independent Trials...\n", N_trials))
 
 for(trial in 1:N_trials) {
-  set.seed(2026 + trial) # 每次循环改变随机种子
+  set.seed(2026 + trial) 
   cat(sprintf("\n=== Running Trial %d / %d ===\n", trial, N_trials))
   
   # 1. Generate Initial Base Design
@@ -211,18 +210,18 @@ for(trial in 1:N_trials) {
   rmse_opt <- sqrt(mean((y_test_true - pred_opt)^2))
   mae_opt  <- mean(abs(y_test_true - pred_opt))
   
-  # 保存当前 Trial 的结果
+  # Save the results of the current Trial
   results_all <- rbind(results_all, data.frame(
-    Trial = trial, Method = "Initial Small Design (3D)", RMSE = rmse_init, MAE = mae_init
+    Trial = trial, Method = "Initial Design (3D)", RMSE = rmse_init, MAE = mae_init
   ))
   results_all <- rbind(results_all, data.frame(
     Trial = trial, Method = "Baseline Expansion (8D)", RMSE = rmse_base, MAE = mae_base
   ))
   results_all <- rbind(results_all, data.frame(
-    Trial = trial, Method = "SA-TBO Expansion (8D)", RMSE = rmse_opt, MAE = mae_opt
+    Trial = trial, Method = "SA-TBO (8D)", RMSE = rmse_opt, MAE = mae_opt
   ))
   
-  # 记录第一次循环的数据用于画图
+  # Record the data of the first cycle for graphing
   if(trial == 1) {
     plot_data$y_test_true <- y_test_true; plot_data$pred_init <- pred_init
     plot_data$pred_base <- pred_base; plot_data$pred_opt <- pred_opt
@@ -252,11 +251,11 @@ cat("Generating PDF Figures for LaTeX...\n")
 
 # Reorder factor levels for logical plotting order
 results_all$Method <- factor(results_all$Method, 
-                             levels = c("Initial Small Design (3D)", 
+                             levels = c("Initial Design (3D)", 
                                         "Baseline Expansion (8D)", 
-                                        "SA-TBO Expansion (8D)"))
+                                        "SA-TBO (8D)"))
 
-# 【新增】Figure: Boxplot of RMSE over 30 trials
+# Figure: Boxplot of RMSE over 30 trials
 pdf("fig_boxplot_rmse5.pdf", width = 8, height = 6)
 par(mar = c(5, 5, 4, 2) + 0.1, cex.lab = 1.2, cex.axis = 1.1, cex.main = 1.4)
 boxplot(RMSE ~ Method, data = results_all, 
